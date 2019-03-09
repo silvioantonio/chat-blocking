@@ -71,13 +71,7 @@ public class Servidor {
         //Loop que aguarda mensagens do cliente recebido por parametro
         //Se a mensagem for nula, entao o cliente desconectou.
         while((mensagemDoCliente = socketDoCliente.getMensagem()) != null){
-            System.out.println("Mensagem do cliente "+socketDoCliente.getLogin()+": "+mensagemDoCliente);
-            
-            if(mensagemDoCliente.endsWith("sair")){
-                socketDoCliente.enviaMensagem("Desconectando :"+socketDoCliente.getLogin());
-                return;
-            }
-            
+                        
             //A mensagem começara com 'login' apenas uma vez por cliente
             if(mensagemDoCliente.startsWith("Login")){
                 socketDoCliente.setLogin(getConteudoDaMensagem(mensagemDoCliente));
@@ -90,6 +84,13 @@ public class Servidor {
             } else {
                 socketDoCliente.enviaMensagem("Comando '"+mensagemDoCliente+"' desconhecido");
             }
+            
+            System.out.println("Mensagem do cliente "+socketDoCliente.getLogin()+": "+mensagemDoCliente);
+            
+            if(mensagemDoCliente.endsWith("sair")){
+                socketDoCliente.enviaMensagem("Desconectando :"+socketDoCliente.getLogin());
+                return;
+            }
         }
         socketDoCliente.close();
     }
@@ -99,9 +100,9 @@ public class Servidor {
         int i = mensagem.indexOf(" ");
         
         //se encontrou espaco, retornu tudo apos ele
-        if(i > -1)
+        if(i > -1){
             return mensagem.substring(i + 1);
-        
+        }
         //se nao encontrar espacos, returna toda a mensagem
         return mensagem;
     }
@@ -109,7 +110,7 @@ public class Servidor {
     private void enviaMensagemParaTodos(EscutaChat socketDoCliente, String mensagemDoCliente){
         
         //usa um iterator para percorrer a lista de clientes conectados
-        final Iterator<EscutaChat> iterator = listaDeClientesConectados.iterator();
+        final Iterator<EscutaChat> iterator = this.listaDeClientesConectados.iterator();
         int numeroDeClientesQueReceberamAMensagem = 0;
         
         /*Percorre a lista usando o iterator enquanto existir um proximo elemento (hasNext)
