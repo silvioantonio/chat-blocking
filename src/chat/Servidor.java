@@ -71,26 +71,22 @@ public class Servidor {
         //Loop que aguarda mensagens do cliente recebido por parametro
         //Se a mensagem for nula, entao o cliente desconectou.
         while((mensagemDoCliente = socketDoCliente.getMensagem()) != null){
-                        
-            //A mensagem começara com 'login' apenas uma vez por cliente
-            if(mensagemDoCliente.startsWith("Login")){
-                socketDoCliente.setLogin(getConteudoDaMensagem(mensagemDoCliente));
-                socketDoCliente.enviaMensagem("Bem Vindo "+getConteudoDaMensagem(mensagemDoCliente));
-            }else if(!mensagemDoCliente.startsWith("@")){
-                /*Se uma mensagem comecar com @ entao ela deve ser privada
-                * caso contrario, ela e publica e deve ser enviada a todos, menos o emissor
-                */
-                enviaMensagemParaTodos(socketDoCliente, mensagemDoCliente);
-            } else {
-                socketDoCliente.enviaMensagem("Comando '"+mensagemDoCliente+"' desconhecido");
-            }
-            
-            System.out.println("Mensagem do cliente "+socketDoCliente.getLogin()+": "+mensagemDoCliente);
             
             if(mensagemDoCliente.endsWith("sair")){
                 socketDoCliente.enviaMensagem("Desconectando :"+socketDoCliente.getLogin());
                 return;
             }
+                        
+            //A mensagem começara com 'login' apenas uma vez por cliente
+            if(mensagemDoCliente.startsWith("Login")){
+                socketDoCliente.setLogin(getConteudoDaMensagem(mensagemDoCliente));
+                socketDoCliente.enviaMensagem("Bem Vindo "+getConteudoDaMensagem(mensagemDoCliente));
+            }else {
+                enviaMensagemParaTodos(socketDoCliente, mensagemDoCliente);
+            }
+            
+            System.out.println("Mensagem do cliente "+socketDoCliente.getLogin()+": "+mensagemDoCliente);
+            
         }
         socketDoCliente.close();
     }
@@ -112,6 +108,8 @@ public class Servidor {
         //usa um iterator para percorrer a lista de clientes conectados
         final Iterator<EscutaChat> iterator = this.listaDeClientesConectados.iterator();
         int numeroDeClientesQueReceberamAMensagem = 0;
+        int i;
+        String loginDaMensagemPrivada;
         
         /*Percorre a lista usando o iterator enquanto existir um proximo elemento (hasNext)
         * para processar, ou seja, enquanto nao percorrer a lista inteira.
@@ -122,13 +120,23 @@ public class Servidor {
             
             //verifica se o cliente atual da lista nao foi o mesmo que enviou a mensagem
             //se nao for, entao a mensagem e enviada para esse cliente
-            if(cliente.equals(socketDoCliente)){
-                if(cliente.enviaMensagem(mensagemDoCliente)){
-                    numeroDeClientesQueReceberamAMensagem ++;
-                } else {
-                    //Caso a mensagem nao tenha sido enviada e porque o cliente desconectou
-                    //remove o cliente da lista
-                    iterator.remove();
+            if(!cliente.equals(socketDoCliente)){
+                if(mensagemDoCliente.startsWith("@")){
+                    i = mensagemDoCliente.indexOf(" ");//pega o indice do primeiro espaco
+                    loginDaMensagemPrivada = mensagemDoCliente.substring(1, i);//pega o login do destinatario
+                    if(cliente.getLogin().equalsIgnoreCase(loginDaMensagemPrivada)){                    
+                        cliente.enviaMensagem(getConteudoDaMensagem(mensagemDoCliente));
+                    }else{
+                        iterator.remove();
+                    }
+                }else{
+                    if(cliente.enviaMensagem(mensagemDoCliente)){ 
+                        numeroDeClientesQueReceberamAMensagem ++;
+                    } else {
+                        //Caso a mensagem nao tenha sido enviada e porque o cliente desconectou
+                        //remove o cliente da lista
+                        iterator.remove();
+                    }
                 }
             }
         }

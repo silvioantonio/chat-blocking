@@ -32,7 +32,7 @@ public class Cliente implements Runnable {
     @Override
     public void run() {
         String mensagemDeTexto;
-        while(!socket.getSocket().isClosed() && (mensagemDeTexto = socket.getMensagem())!= null){
+        while(!socket.getSocket().isClosed() && ((mensagemDeTexto = socket.getMensagem())!= null)){
             System.out.println("Texto recebido: "+mensagemDeTexto+"\n");
         }
     }
@@ -43,10 +43,12 @@ public class Cliente implements Runnable {
             System.out.println("Login: ");
             mensagemDeTexto = scanner.nextLine();
         }while(mensagemDeTexto == null);
+        
         System.out.println("Servidor diz: "+ socket.enviaMensagemEPegaResposta("Login:  "+mensagemDeTexto));
         
         new Thread(this).start();
         System.out.println("Digite SAIR a qualquer monento para fechar o chat!!!");
+        
         while(!"sair".equalsIgnoreCase(mensagemDeTexto)){
             System.out.println("Eu: ");
             mensagemDeTexto = this.scanner.nextLine();//Escreve a mensagem
