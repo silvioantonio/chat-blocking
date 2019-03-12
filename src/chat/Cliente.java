@@ -11,7 +11,7 @@ import java.util.Scanner;
 public class Cliente implements Runnable {
 
     public static final String SERVER_ADDRESS = "127.0.0.1";
-    private EscutaChat socket;
+    private EscutaChat escutaChat;
     private Scanner scanner;
     
     public Cliente() throws IOException{
@@ -20,7 +20,7 @@ public class Cliente implements Runnable {
     
     private void iniciar() throws IOException{
         try {
-            this.socket = new EscutaChat(new Socket(SERVER_ADDRESS,Servidor.PORT));
+            this.escutaChat = new EscutaChat(new Socket(SERVER_ADDRESS,Servidor.PORT));
             
             loopDeMensagem();
             
@@ -32,7 +32,7 @@ public class Cliente implements Runnable {
     @Override
     public void run() {
         String mensagemDeTexto;
-        while(!socket.getSocket().isClosed() && ((mensagemDeTexto = socket.getMensagem())!= null)){
+        while(!escutaChat.getSocket().isClosed() && ((mensagemDeTexto = escutaChat.getMensagem())!= null)){
             System.out.println("Texto recebido: "+mensagemDeTexto+"\n");
         }
     }
@@ -44,7 +44,7 @@ public class Cliente implements Runnable {
             mensagemDeTexto = scanner.nextLine();
         }while(mensagemDeTexto == null);
         
-        System.out.println("Servidor diz: "+ socket.enviaMensagemEPegaResposta("Login:  "+mensagemDeTexto));
+        System.out.println("Servidor diz: "+ escutaChat.enviaMensagemEPegaResposta("Login:  "+mensagemDeTexto));
         
         new Thread(this).start();
         System.out.println("Digite SAIR a qualquer monento para fechar o chat!!!");
@@ -53,9 +53,9 @@ public class Cliente implements Runnable {
             System.out.println("Eu: ");
             mensagemDeTexto = this.scanner.nextLine();//Escreve a mensagem
             if(mensagemDeTexto != null)
-                socket.enviaMensagem(mensagemDeTexto);//Manda a mensagem pro servidor
+                escutaChat.enviaMensagem(mensagemDeTexto);//Manda a mensagem pro servidor
         }
-        socket.close();
+        escutaChat.close();
     }
     
     public static void main(String[] args) throws IOException {
