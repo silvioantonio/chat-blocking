@@ -44,7 +44,7 @@ public class Cliente implements Runnable {
             mensagemDeTexto = scanner.nextLine();
         }while(mensagemDeTexto == null);
         
-        System.out.println("Servidor diz: "+ socket.enviaMensagemEPegaResposta("Login:  "+mensagemDeTexto));
+        System.out.println("Servidor diz: "+ socket.enviaMensagemEPegaResposta("Login: "+mensagemDeTexto));
         
         new Thread(this).start();
         System.out.println("Digite SAIR a qualquer monento para fechar o chat!!!");
