@@ -33,7 +33,7 @@ public class Cliente implements Runnable {
     public void run() {
         String mensagemDeTexto;
         while(!escutaChat.getSocket().isClosed() && ((mensagemDeTexto = escutaChat.getMensagem())!= null)){
-            System.out.println("Texto recebido: "+mensagemDeTexto+"\n");
+            System.out.println(mensagemDeTexto+"\n");
         }
     }
     
@@ -44,9 +44,10 @@ public class Cliente implements Runnable {
             mensagemDeTexto = scanner.nextLine();
         }while(mensagemDeTexto == null);
         
-        System.out.println("Servidor diz: "+ escutaChat.enviaMensagemEPegaResposta("Login:  "+mensagemDeTexto));
+        System.out.println("Servidor diz: "+ escutaChat.enviaMensagemEPegaResposta("Login: "+mensagemDeTexto));
         
         new Thread(this).start();
+        
         System.out.println("Digite SAIR a qualquer monento para fechar o chat!!!");
         
         while(!"sair".equalsIgnoreCase(mensagemDeTexto)){

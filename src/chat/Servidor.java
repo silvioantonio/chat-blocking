@@ -74,7 +74,7 @@ public class Servidor {
             
             if(mensagemDoCliente.endsWith("sair")){
                 socketDoCliente.enviaMensagem("Desconectando :"+socketDoCliente.getLogin());
-                return;
+                break;
             }
                         
             //A mensagem começara com 'login' apenas uma vez por cliente
@@ -103,8 +103,7 @@ public class Servidor {
         return mensagem;
     }
     
-    private void enviaMensagemParaTodos(EscutaChat socketDoCliente, String mensagemDoCliente){
-        
+    private void enviaMensagemParaTodos(EscutaChat socketDoClienteOrigem, String mensagemDoCliente){    
         //usa um iterator para percorrer a lista de clientes conectados
         final Iterator<EscutaChat> iterator = this.listaDeClientesConectados.iterator();
         int numeroDeClientesQueReceberamAMensagem = 0;
@@ -116,21 +115,20 @@ public class Servidor {
         */
         while(iterator.hasNext()){
             //pega o elemento autal da lista
-            EscutaChat cliente = iterator.next();
+            EscutaChat clienteDestino = iterator.next();
             
             //verifica se o cliente atual da lista nao foi o mesmo que enviou a mensagem
             //se nao for, entao a mensagem e enviada para esse cliente
-            if(!cliente.equals(socketDoCliente)){
+            if(!clienteDestino.equals(socketDoClienteOrigem)){
                 if(mensagemDoCliente.startsWith("@")){
                     i = mensagemDoCliente.indexOf(" ");//pega o indice do primeiro espaco
                     loginDaMensagemPrivada = mensagemDoCliente.substring(1, i);//pega o login do destinatario
-                    if(cliente.getLogin().equalsIgnoreCase(loginDaMensagemPrivada)){                    
-                        cliente.enviaMensagem(getConteudoDaMensagem(mensagemDoCliente));
-                    }else{
-                        iterator.remove();
+                    if(clienteDestino.getLogin().equalsIgnoreCase(loginDaMensagemPrivada)){
+                        clienteDestino.enviaMensagem(socketDoClienteOrigem.getLogin()+": "+getConteudoDaMensagem(mensagemDoCliente));
+                        break;
                     }
                 }else{
-                    if(cliente.enviaMensagem(mensagemDoCliente)){ 
+                    if(clienteDestino.enviaMensagem(mensagemDoCliente)){ 
                         numeroDeClientesQueReceberamAMensagem ++;
                     } else {
                         //Caso a mensagem nao tenha sido enviada e porque o cliente desconectou
@@ -140,7 +138,7 @@ public class Servidor {
                 }
             }
         }
-        System.out.println("Mensagem enviada para "+numeroDeClientesQueReceberamAMensagem+" clientes.");
+        System.out.println("Mensagem publica enviada para "+numeroDeClientesQueReceberamAMensagem+" clientes.");
     }
     
     private void stop() throws IOException {
