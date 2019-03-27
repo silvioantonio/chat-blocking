@@ -43,7 +43,7 @@ public class Cliente implements Runnable {
             System.out.println("Login: ");
             mensagemDeTexto = scanner.nextLine();
         }while(mensagemDeTexto == null);
-        
+       
         System.out.println("Servidor diz: "+ escutaChat.enviaMensagemEPegaResposta("Login: "+mensagemDeTexto));
         
         new Thread(this).start();
